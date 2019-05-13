@@ -78,7 +78,7 @@ while True:
             print("Training Neural Network...")
             print("nExamples:",nExamples,"Epochs:",oscserver.epochs)
             nn.train(x,y,nExamples,oscserver.epochs)
-            print("Finished Training Existing Neural Network")
+            print("Finished Training Neural Network")
             oscclient.sendMsg(np.array([[0],[0]]).tolist(),'/keras/training')
             trained = 1
             oscserver.train = 0
