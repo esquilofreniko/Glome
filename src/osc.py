@@ -29,15 +29,31 @@ class OscClient:
         self.client.send(out)
 
 class OscServer:
+    def getPred(self,unused_addr,arraynum,*args):
+        if arraynum == 0:
+            self.prePred = args
+        if arraynum >= 1:
+            self.prePred = np.vstack((self.prePred,args))
+        if arraynum == 14:
+            test = self.prePred.ravel()
+            if(test.size == 11025):
+                self.pred = test
+                # print("P:",self.pred.size)
+            # else:
+                # print("Error Receiving P - Wrong Size")
+
     def getX(self,unused_addr, arraynum, *args):
-        # self.xin = args
         if arraynum == 0:
             self.prex = args
         if arraynum >= 1:
             self.prex = np.vstack((self.prex,args))
         if arraynum == 14:
-            self.xin = self.prex.ravel()
-            # print(self.xhandler,"received with size:",np.array(self.xin).size)
+            test = self.prex.ravel()
+            if(test.size == 11025):
+                self.xin = test
+                print("X:",self.xin.size)
+            else:
+                print("Error Receiving X - Wrong Size")
 
     def getY(self,unused_addr, arraynum, *args):
         if arraynum == 0:
@@ -45,8 +61,12 @@ class OscServer:
         if arraynum >= 1:
             self.prey = np.vstack((self.prey,args))
         if arraynum == 14:
-            self.yin = self.prey.ravel()
-            # print(self.yhandler,"received with size:",np.array(self.yin).size)
+            test = self.prey.ravel()
+            if(test.size == 11025):
+                self.yin = test
+                print("Y:",self.yin.size)
+            else:
+                print("Error Receiving Y - Wrong Size")
     
     def addExample(self,unused_addr,*args):
         self.addexample = 1
@@ -70,7 +90,7 @@ class OscServer:
         self.epochs = args[1]
         print("Epochs:",self.epochs)
         
-    def __init__(self,ip,port,xhandler,yhandler):
+    def __init__(self,ip,port,xhandler,yhandler,predhandler):
         self.epochs = 1000
         self.addexample = 0
         self.delexample = 0
@@ -78,15 +98,19 @@ class OscServer:
         self.train = 0
         self.trainNew = 0
         self.quit = 0
+        self.pred = np.array([0])
         self.xin = np.array([0])
         self.yin = np.array([0])
+        self.prePred = np.array([0])
         self.prex = np.array([0])
         self.prey = np.array([0])
         self.xhandler = xhandler
         self.yhandler = yhandler
+        self.predhandler= predhandler
         self.dispatcher = dispatcher.Dispatcher()
         self.dispatcher.map(xhandler, self.getX)
         self.dispatcher.map(yhandler,self.getY)
+        self.dispatcher.map(predhandler,self.getPred)
         self.dispatcher.map('/keras/epochs',self.getEpochs)
         self.dispatcher.map('/keras/addExample',self.addExample)
         self.dispatcher.map('/keras/delExample',self.delExample)

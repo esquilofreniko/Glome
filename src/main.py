@@ -22,15 +22,15 @@ y = np.array([0])
 nn = NeuralNetRegression(np.zeros((1,11025)),np.zeros((1,11025)),nHidden,nNodes)
 oscclient = OscClient("127.0.0.1",12000)
 oscclient.sendMsg(np.array([[0],[0]]).tolist(),'/keras/training')
-oscserver = OscServer("127.0.0.1",6448,'/keras/Xin','/keras/Yin')
+oscserver = OscServer("127.0.0.1",6448,'/keras/Xin','/keras/Yin','/keras/predIn')
 print("press \+q: quit")
 
 while True:
     time.sleep(0.1)
     if trained == 1:
-        xin = np.array([oscserver.xin])
-        if(xin.shape[1] == 11025):
-            yout = nn.predict(xin)
+        pred = np.array([oscserver.pred])
+        if(pred.shape[1] == 11025):
+            yout = nn.predict(pred)
             yout = yout.tolist()
             oscclient.sendMsg(yout,'/keras/Yout')
             oscserverxin = oscserver.xin

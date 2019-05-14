@@ -16,7 +16,7 @@ class NeuralNetRegression:
         self.nHidden = nHidden
         self.nNodes = nNodes
         self.model = Sequential()
-        self.model.add(Dense(self.nNodes, input_dim=self.inputdimension, activation='relu'))
+        self.model.add(Dense(self.nNodes, input_dim=self.inputdimension, activation='linear'))
         for i in range(nHidden-1):
             self.model.add(Dense(self.nNodes, activation='relu'))
         self.model.add(Dense(self.outputdimension, activation='linear'))
